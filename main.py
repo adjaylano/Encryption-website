@@ -8,6 +8,7 @@ app.secret_key = 'your-secret-key-here'  # Change this in production
 
 # Define access levels
 ACCESS_LEVELS = {
+    "Omega": 4,
     "Alpha Prime": 3,
     "Alpha": 2,
     "Beta": 1,
@@ -146,7 +147,7 @@ def dashboard():
     files = [file for file in all_files 
              if ACCESS_LEVELS[session['clearance']] >= ACCESS_LEVELS[file['clearance_level']]]
     
-    return render_template('dashboard.html', files=files)
+    return render_template('dashboard.html', files=files, ACCESS_LEVELS=ACCESS_LEVELS)
 
 @app.route('/create', methods=['POST'])
 def create_file():
@@ -155,13 +156,19 @@ def create_file():
     
     filename = request.form['filename'].strip()
     content = request.form['content']
+    doc_clearance = request.form['doc_clearance']
     
-    encrypted_content = CIPHERS[session['clearance']].encrypt(content.encode())
+    # Check if user has sufficient clearance to create file at this level
+    if ACCESS_LEVELS[session['clearance']] < ACCESS_LEVELS[doc_clearance]:
+        flash('You cannot create files with higher clearance than your own.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    encrypted_content = CIPHERS[doc_clearance].encrypt(content.encode())
     
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO files (filename, encrypted_data, clearance_level) VALUES (?, ?, ?)",
-                  (filename, encrypted_content, session['clearance']))
+                  (filename, encrypted_content, doc_clearance))
     conn.commit()
     conn.close()
     

@@ -18,6 +18,16 @@
                         <label class="form-label">Content</label>
                         <textarea class="form-control" name="content" rows="4" required></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Document Clearance Level</label>
+                        <select class="form-select" name="doc_clearance" required>
+                            {% for level, value in session.get('access_levels', {}).items() %}
+                                {% if value <= ACCESS_LEVELS[session.clearance] %}
+                                    <option value="{{ level }}">{{ level }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Create File</button>
                 </form>
             </div>
