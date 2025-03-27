@@ -229,7 +229,8 @@ def assistant():
                 import openai
                 openai.api_key = app.config['OPENAI_API_KEY']
                 
-                response = openai.ChatCompletion.create(
+                client = openai.OpenAI(api_key=app.config['OPENAI_API_KEY'])
+                response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": "You are a helpful assistant for the Secure Document Vault system."},
