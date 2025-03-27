@@ -228,16 +228,14 @@ def assistant():
         if user_message:
             try:
                 # Use Hugging Face's free API
-                url = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
+                url = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
                 headers = {"Content-Type": "application/json"}
                 
                 data = {
-                    "inputs": {
-                        "text": f"""You are helping with a secure document vault system.
-                        User clearance: {session['clearance']}
-                        Available levels: {', '.join(ACCESS_LEVELS.keys())}
-                        
-                        User question: {user_message}"""
+                    "inputs": user_message,
+                    "parameters": {
+                        "max_length": 100,
+                        "temperature": 0.7
                     }
                 }
                 
