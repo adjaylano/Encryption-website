@@ -9,6 +9,12 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">Secure Document Vault</a>
+            {% if session.get('clearance') == 'Alpha Prime' %}
+            <a class="btn btn-outline-light" href="{{ url_for('manage_users') }}">Manage Users</a>
+            {% endif %}
+            {% if session.get('name') %}
+            <a class="btn btn-outline-light" href="{{ url_for('logout') }}">Logout</a>
+            {% endif %}
         </div>
     </nav>
     <div class="container mt-4">

@@ -14,11 +14,14 @@ ACCESS_LEVELS = {
     "Gamma": 0
 }
 
-# List of allowed users
-ALLOWED_USERS = {
-    "Djaylano Asper",
-    "Kaj Hogewoning"
-}
+# Initialize users table
+def init_users():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS users
+                     (name TEXT PRIMARY KEY, clearance_level TEXT)''')
+    conn.commit()
+    conn.close()
 
 def get_db():
     conn = sqlite3.connect("secure_files.db")
@@ -66,21 +69,67 @@ def init_db():
 CIPHERS = init_keys()
 init_db()
 
+# Initialize admin user
+def init_admin():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO users (name, clearance_level) VALUES (?, ?)",
+                  ("Admin", "Alpha Prime"))
+    conn.commit()
+    conn.close()
+
+init_users()
+init_admin()
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         name = request.form['name'].strip()
-        clearance = request.form['clearance'].strip()
         
-        if clearance not in ACCESS_LEVELS or name not in ALLOWED_USERS:
-            flash('Access denied! Invalid clearance level or unauthorized user.', 'danger')
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT clearance_level FROM users WHERE name = ?", (name,))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if not user:
+            flash('Access denied! Unauthorized user.', 'danger')
         else:
             session['name'] = name
-            session['clearance'] = clearance
+            session['clearance'] = user['clearance_level']
             flash(f'Welcome, {name}!', 'success')
             return redirect(url_for('dashboard'))
     
     return render_template('login.html')
+
+@app.route('/manage_users', methods=['GET', 'POST'])
+def manage_users():
+    if 'name' not in session or session['clearance'] != 'Alpha Prime':
+        flash('Only Alpha Prime users can manage users.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    if request.method == 'POST':
+        name = request.form['name'].strip()
+        clearance = request.form['clearance'].strip()
+        
+        if clearance not in ACCESS_LEVELS:
+            flash('Invalid clearance level.', 'danger')
+        else:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("INSERT OR REPLACE INTO users (name, clearance_level) VALUES (?, ?)",
+                         (name, clearance))
+            conn.commit()
+            conn.close()
+            flash(f'User {name} added/updated successfully.', 'success')
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+    conn.close()
+    
+    return render_template('manage_users.html', users=users, access_levels=ACCESS_LEVELS.keys())
 
 @app.route('/dashboard')
 def dashboard():
