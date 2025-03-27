@@ -237,7 +237,7 @@ def assistant():
 
                 # Get response from a free model
                 response = g4f.ChatCompletion.create(
-                    model=g4f.models.gpt_35_turbo,
+                    model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_message}
