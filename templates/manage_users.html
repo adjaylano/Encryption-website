@@ -12,6 +12,10 @@
                         <input type="text" class="form-control" name="name" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Clearance Level</label>
                         <select class="form-select" name="clearance" required>
                             {% for level in access_levels %}

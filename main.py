@@ -112,6 +112,7 @@ def manage_users():
     
     if request.method == 'POST':
         name = request.form['name'].strip()
+        password = request.form['password']
         clearance = request.form['clearance'].strip()
         
         if clearance not in ACCESS_LEVELS:
@@ -119,8 +120,8 @@ def manage_users():
         else:
             conn = get_db()
             cursor = conn.cursor()
-            cursor.execute("INSERT OR REPLACE INTO users (name, clearance_level) VALUES (?, ?)",
-                         (name, clearance))
+            cursor.execute("INSERT OR REPLACE INTO users (name, password, clearance_level) VALUES (?, ?, ?)",
+                         (name, password, clearance))
             conn.commit()
             conn.close()
             flash(f'User {name} added/updated successfully.', 'success')
