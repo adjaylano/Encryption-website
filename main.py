@@ -229,7 +229,7 @@ def assistant():
                 import requests
                 import time
                 
-                API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
+                API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-small"
                 response = requests.post(API_URL, json={"inputs": user_message})
                 result = response.json()
                 
