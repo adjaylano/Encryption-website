@@ -1,13 +1,10 @@
 
-import os
 import sqlite3
-import requests
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from cryptography.fernet import Fernet
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Change this in production
-app.config['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY')
 
 # Define access levels
 ACCESS_LEVELS = {
@@ -97,13 +94,7 @@ def login():
         user = cursor.fetchone()
         conn.close()
         
-        # Special code check for Omega clearance
-        if password == "9137" and name.strip():
-            session['name'] = name
-            session['clearance'] = "Omega"
-            flash(f'Welcome, {name}!', 'success')
-            return redirect(url_for('dashboard'))
-        elif not user or user['password'] != password:
+        if not user or user['password'] != password:
             flash('Invalid username or password.', 'danger')
         else:
             session['name'] = name
@@ -115,8 +106,8 @@ def login():
 
 @app.route('/manage_users', methods=['GET', 'POST'])
 def manage_users():
-    if 'name' not in session or session['clearance'] != 'Omega':
-        flash('Only Omega users can manage users.', 'danger')
+    if 'name' not in session or session['clearance'] not in ['Alpha Prime', 'Omega']:
+        flash('Only Alpha Prime and Omega users can manage users.', 'danger')
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
@@ -218,40 +209,5 @@ def logout():
     flash('Logged out successfully.', 'success')
     return redirect(url_for('login'))
 
-@app.route('/assistant', methods=['GET', 'POST'])
-def assistant():
-    if 'name' not in session:
-        return redirect(url_for('login'))
-    
-    if request.method == 'POST':
-        user_message = request.form.get('message', '').strip()
-        if user_message:
-            try:
-                import g4f
-
-                # Create system prompt
-                system_prompt = f"""You are an AI assistant helping users with a secure document vault system.
-                The user's clearance level is {session['clearance']}.
-                Available clearance levels are: {', '.join(ACCESS_LEVELS.keys())}.
-                You can help with file operations, access rights, and system information."""
-
-                # Get response using DeepInfra provider
-                response = g4f.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    provider=g4f.Provider.DeepInfra,
-                    messages=[{"role": "user", "content": user_message}]
-                )
-                
-                if response:
-                    return jsonify({"response": response})
-                else:
-                    return jsonify({"error": "No response from AI"}), 500
-                    
-            except Exception as e:
-                return jsonify({"error": str(e)}), 500
-        return jsonify({"error": "No message provided"}), 400
-    
-    return render_template('assistant.html')
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=5000)
