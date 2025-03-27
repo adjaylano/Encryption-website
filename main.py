@@ -243,11 +243,10 @@ def assistant():
                 
                 response = requests.post(url, headers=headers, json=data)
                 if response.status_code == 200:
-                    ai_response = response.json()['choices'][0]['message']['content']
+                    ai_response = response.json()[0]['generated_text']
                     return jsonify({"response": ai_response})
                 else:
-                    error_message = response.json().get('error', {}).get('message', 'Failed to get AI response')
-                    return jsonify({"error": error_message}), 500
+                    return jsonify({"error": "Failed to get AI response"}), 500
                     
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
