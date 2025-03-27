@@ -114,8 +114,8 @@ def login():
 
 @app.route('/manage_users', methods=['GET', 'POST'])
 def manage_users():
-    if 'name' not in session or session['clearance'] not in ['Alpha Prime', 'Omega']:
-        flash('Only Alpha Prime and Omega users can manage users.', 'danger')
+    if 'name' not in session or session['clearance'] != 'Omega':
+        flash('Only Omega users can manage users.', 'danger')
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
@@ -226,29 +226,20 @@ def assistant():
         user_message = request.form.get('message', '').strip()
         if user_message:
             try:
-                import requests
-                import time
-                
-                headers = {"Content-Type": "application/json"}
-                API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
-                response = requests.post(API_URL, headers=headers, json={"inputs": {"text": user_message}})
-                result = response.json()
-                
-                # Check if model is still loading
-                if isinstance(result, dict) and "error" in result:
-                    if "loading" in result["error"].lower():
-                        # Wait a bit and retry once
-                        time.sleep(1)
-                        response = requests.post(API_URL, json={"inputs": user_message})
-                        result = response.json()
-                
-                if isinstance(result, list) and len(result) > 0:
-                    ai_response = result[0].get("generated_text", "")
-                    if ai_response:
-                        return jsonify({"response": ai_response})
-                return jsonify({"response": "I understand. How can I help you further?"})
+                # Simple rule-based responses
+                user_message = user_message.lower()
+                if 'hello' in user_message or 'hi' in user_message:
+                    return jsonify({"response": "Hello! How can I help you today?"})
+                elif 'help' in user_message:
+                    return jsonify({"response": "I can help you with basic questions about the secure document vault."})
+                elif 'file' in user_message or 'document' in user_message:
+                    return jsonify({"response": "You can create and retrieve files based on your clearance level."})
+                elif 'clearance' in user_message:
+                    return jsonify({"response": "There are multiple clearance levels: Gamma, Beta, Alpha, Alpha Prime, and Omega."})
+                elif 'access' in user_message:
+                    return jsonify({"response": "Your access is determined by your clearance level. Higher clearance gives more access."})
                 else:
-                    return jsonify({"error": "The AI assistant is currently unavailable. Please try again in a moment."})
+                    return jsonify({"response": "I understand. Please ask about files, clearance levels, or access rights."})
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
         return jsonify({"error": "No message provided"}), 400
