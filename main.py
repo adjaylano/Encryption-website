@@ -25,7 +25,7 @@ def init_users():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                     (name TEXT PRIMARY KEY, password TEXT, clearance_level TEXT)''')
+                     (name TEXT PRIMARY KEY, clearance_level TEXT)''')
     conn.commit()
     conn.close()
 
@@ -33,8 +33,8 @@ def init_users():
 def init_admin():
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO users (name, password, clearance_level) VALUES (?, ?, ?)",
-                   ("Admin", "9137", "Omega"))
+    cursor.execute("INSERT OR IGNORE INTO users (name, clearance_level) VALUES (?, ?)",
+                  ("Admin", "Alpha Prime"))
     conn.commit()
     conn.close()
 
