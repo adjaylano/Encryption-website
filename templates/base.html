@@ -9,7 +9,7 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">Secure Document Vault</a>
-            {% if session.get('clearance') == 'Alpha Prime' %}
+            {% if session.get('name') and session.get('clearance') == 'Alpha Prime' %}
             <a class="btn btn-outline-light" href="{{ url_for('manage_users') }}">Manage Users</a>
             {% endif %}
             {% if session.get('name') %}
