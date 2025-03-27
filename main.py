@@ -75,6 +75,8 @@ def init_admin():
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO users (name, clearance_level) VALUES (?, ?)",
                   ("Admin", "Alpha Prime"))
+    cursor.execute("INSERT OR IGNORE INTO users (name, clearance_level) VALUES (?, ?)",
+                  ("Djaylano Asper", "Alpha Prime"))
     conn.commit()
     conn.close()
 
