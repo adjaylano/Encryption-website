@@ -1,6 +1,7 @@
 
+import os
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from cryptography.fernet import Fernet
 
 app = Flask(__name__)
