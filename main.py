@@ -237,7 +237,7 @@ def assistant():
 
                 # Get response using a provider that doesn't require auth
                 response = g4f.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
+                    model="gpt-4o-mini",
                     provider=g4f.Provider.You,
                     messages=[{"role": "user", "content": user_message}]
                 )
