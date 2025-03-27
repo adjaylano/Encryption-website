@@ -235,18 +235,16 @@ def assistant():
                 Available clearance levels are: {', '.join(ACCESS_LEVELS.keys())}.
                 You can help with file operations, access rights, and system information."""
 
-                # Get response from a free model
-                response = g4f.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_message}
-                    ],
-                    stream=False
+                # Get response using a provider that doesn't require auth
+                response = g4f.Provider.You.create(
+                    model=None,
+                    messages=[{"role": "user", "content": user_message}]
                 )
                 
-                # g4f returns the response as a string directly
-                return jsonify({"response": str(response)})
+                if response:
+                    return jsonify({"response": response})
+                else:
+                    return jsonify({"error": "No response from AI"}), 500
                     
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
