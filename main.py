@@ -227,10 +227,25 @@ def assistant():
         if user_message:
             try:
                 import requests
+                import time
+                
                 API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
                 response = requests.post(API_URL, json={"inputs": user_message})
-                ai_response = response.json()[0]["generated_text"]
-                return jsonify({"response": ai_response})
+                result = response.json()
+                
+                # Check if model is still loading
+                if isinstance(result, dict) and "error" in result:
+                    if "loading" in result["error"].lower():
+                        # Wait a bit and retry once
+                        time.sleep(1)
+                        response = requests.post(API_URL, json={"inputs": user_message})
+                        result = response.json()
+                
+                if isinstance(result, list) and len(result) > 0:
+                    ai_response = result[0]["generated_text"]
+                    return jsonify({"response": ai_response})
+                else:
+                    return jsonify({"error": "The AI assistant is currently unavailable. Please try again in a moment."})
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
         return jsonify({"error": "No message provided"}), 400
