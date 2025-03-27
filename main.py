@@ -241,10 +241,12 @@ def assistant():
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_message}
-                    ]
+                    ],
+                    stream=False
                 )
                 
-                return jsonify({"response": response})
+                # g4f returns the response as a string directly
+                return jsonify({"response": str(response)})
                     
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
