@@ -226,20 +226,33 @@ def assistant():
         user_message = request.form.get('message', '').strip()
         if user_message:
             try:
-                # Simple rule-based responses
-                user_message = user_message.lower()
-                if 'hello' in user_message or 'hi' in user_message:
-                    return jsonify({"response": "Hello! How can I help you today?"})
-                elif 'help' in user_message:
-                    return jsonify({"response": "I can help you with basic questions about the secure document vault."})
-                elif 'file' in user_message or 'document' in user_message:
-                    return jsonify({"response": "You can create and retrieve files based on your clearance level."})
-                elif 'clearance' in user_message:
-                    return jsonify({"response": "There are multiple clearance levels: Gamma, Beta, Alpha, Alpha Prime, and Omega."})
-                elif 'access' in user_message:
-                    return jsonify({"response": "Your access is determined by your clearance level. Higher clearance gives more access."})
+                # Use DeepSeek API for chat completion
+                url = "https://api.deepseek.com/v1/chat/completions"
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {os.environ.get('DEEPSEEK_API_KEY')}"
+                }
+                
+                system_prompt = f"""You are an AI assistant helping users with a secure document vault system.
+                The user's clearance level is {session['clearance']}.
+                Available clearance levels are: {', '.join(ACCESS_LEVELS.keys())}.
+                You can help with file operations, access rights, and system information."""
+                
+                data = {
+                    "model": "deepseek-chat",
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message}
+                    ]
+                }
+                
+                response = requests.post(url, headers=headers, json=data)
+                if response.status_code == 200:
+                    ai_response = response.json()['choices'][0]['message']['content']
+                    return jsonify({"response": ai_response})
                 else:
-                    return jsonify({"response": "I understand. Please ask about files, clearance levels, or access rights."})
+                    return jsonify({"error": "Failed to get AI response"}), 500
+                    
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
         return jsonify({"error": "No message provided"}), 400
