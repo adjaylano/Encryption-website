@@ -229,8 +229,9 @@ def assistant():
                 import requests
                 import time
                 
-                API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-small"
-                response = requests.post(API_URL, json={"inputs": user_message})
+                headers = {"Content-Type": "application/json"}
+                API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
+                response = requests.post(API_URL, headers=headers, json={"inputs": {"text": user_message}})
                 result = response.json()
                 
                 # Check if model is still loading
@@ -242,8 +243,10 @@ def assistant():
                         result = response.json()
                 
                 if isinstance(result, list) and len(result) > 0:
-                    ai_response = result[0]["generated_text"]
-                    return jsonify({"response": ai_response})
+                    ai_response = result[0].get("generated_text", "")
+                    if ai_response:
+                        return jsonify({"response": ai_response})
+                return jsonify({"response": "I understand. How can I help you further?"})
                 else:
                     return jsonify({"error": "The AI assistant is currently unavailable. Please try again in a moment."})
             except Exception as e:
