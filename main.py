@@ -226,19 +226,10 @@ def assistant():
         user_message = request.form.get('message', '').strip()
         if user_message:
             try:
-                import openai
-                openai.api_key = app.config['OPENAI_API_KEY']
-                
-                client = openai.OpenAI(api_key=app.config['OPENAI_API_KEY'])
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "You are a helpful assistant for the Secure Document Vault system."},
-                        {"role": "user", "content": user_message}
-                    ]
-                )
-                
-                ai_response = response.choices[0].message.content
+                import requests
+                API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
+                response = requests.post(API_URL, json={"inputs": user_message})
+                ai_response = response.json()[0]["generated_text"]
                 return jsonify({"response": ai_response})
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
