@@ -14,6 +14,7 @@
                     {% if session.get('clearance') in ['Alpha Prime', 'Omega'] %}
                         <a class="btn btn-outline-light me-2" href="{{ url_for('manage_users') }}">Manage Users</a>
                     {% endif %}
+                    <a class="btn btn-outline-light me-2" href="{{ url_for('assistant') }}">AI Assistant</a>
                     <a class="btn btn-outline-light" href="{{ url_for('logout') }}">Logout</a>
                 {% endif %}
             </div>

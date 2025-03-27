@@ -1,0 +1,61 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">AI Assistant</div>
+            <div class="card-body">
+                <div id="chat-container" class="mb-3" style="height: 300px; overflow-y: auto;">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <form id="chat-form" class="d-flex">
+                    <input type="text" id="user-input" class="form-control me-2" placeholder="Type your message...">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    // Add user message to chat
+    addMessageToChat('You', message);
+    input.value = '';
+
+    try {
+        const response = await fetch('/assistant', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `message=${encodeURIComponent(message)}`
+        });
+        
+        const data = await response.json();
+        if (data.error) {
+            addMessageToChat('Error', data.error);
+        } else {
+            addMessageToChat('Assistant', data.response);
+        }
+    } catch (error) {
+        addMessageToChat('Error', 'Failed to get response');
+    }
+});
+
+function addMessageToChat(sender, message) {
+    const container = document.getElementById('chat-container');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'mb-2';
+    messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+</script>
+{% endblock %}

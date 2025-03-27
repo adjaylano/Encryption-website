@@ -5,6 +5,7 @@ from cryptography.fernet import Fernet
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Change this in production
+app.config['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY')
 
 # Define access levels
 ACCESS_LEVELS = {
@@ -208,6 +209,34 @@ def logout():
     session.clear()
     flash('Logged out successfully.', 'success')
     return redirect(url_for('login'))
+
+@app.route('/assistant', methods=['GET', 'POST'])
+def assistant():
+    if 'name' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        user_message = request.form.get('message', '').strip()
+        if user_message:
+            try:
+                import openai
+                openai.api_key = app.config['OPENAI_API_KEY']
+                
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant for the Secure Document Vault system."},
+                        {"role": "user", "content": user_message}
+                    ]
+                )
+                
+                ai_response = response.choices[0].message.content
+                return jsonify({"response": ai_response})
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "No message provided"}), 400
+    
+    return render_template('assistant.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
