@@ -236,8 +236,9 @@ def assistant():
                 You can help with file operations, access rights, and system information."""
 
                 # Get response using a provider that doesn't require auth
-                response = g4f.Provider.You.create(
-                    model=None,
+                response = g4f.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    provider=g4f.Provider.You,
                     messages=[{"role": "user", "content": user_message}]
                 )
                 
