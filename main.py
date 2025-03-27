@@ -19,7 +19,7 @@ def init_users():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                     (name TEXT PRIMARY KEY, clearance_level TEXT)''')
+                     (name TEXT PRIMARY KEY, password TEXT, clearance_level TEXT)''')
     conn.commit()
     conn.close()
 
@@ -73,10 +73,8 @@ init_db()
 def init_admin():
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO users (name, clearance_level) VALUES (?, ?)",
-                  ("Admin", "Alpha Prime"))
-    cursor.execute("INSERT OR IGNORE INTO users (name, clearance_level) VALUES (?, ?)",
-                  ("Djaylano Asper", "Alpha Prime"))
+    cursor.execute("INSERT OR IGNORE INTO users (name, password, clearance_level) VALUES (?, ?, ?)",
+                  ("Admin", "admin123", "Alpha Prime"))
     conn.commit()
     conn.close()
 
@@ -87,15 +85,16 @@ init_admin()
 def login():
     if request.method == 'POST':
         name = request.form['name'].strip()
+        password = request.form['password']
         
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("SELECT clearance_level FROM users WHERE name = ?", (name,))
+        cursor.execute("SELECT clearance_level, password FROM users WHERE name = ?", (name,))
         user = cursor.fetchone()
         conn.close()
         
-        if not user:
-            flash('Access denied! Unauthorized user.', 'danger')
+        if not user or user['password'] != password:
+            flash('Invalid username or password.', 'danger')
         else:
             session['name'] = name
             session['clearance'] = user['clearance_level']
