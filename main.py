@@ -227,25 +227,18 @@ def assistant():
         user_message = request.form.get('message', '').strip()
         if user_message:
             try:
-                # Use OpenAI API for chat completion
-                url = "https://api.openai.com/v1/chat/completions"
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY')}"
-                }
-                
-                system_prompt = f"""You are an AI assistant helping users with a secure document vault system.
-                The user's clearance level is {session['clearance']}.
-                Available clearance levels are: {', '.join(ACCESS_LEVELS.keys())}.
-                You can help with file operations, access rights, and system information."""
+                # Use Hugging Face's free API
+                url = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
+                headers = {"Content-Type": "application/json"}
                 
                 data = {
-                    "model": "gpt-3.5-turbo",
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_message}
-                    ],
-                    "temperature": 0.7
+                    "inputs": {
+                        "text": f"""You are helping with a secure document vault system.
+                        User clearance: {session['clearance']}
+                        Available levels: {', '.join(ACCESS_LEVELS.keys())}
+                        
+                        User question: {user_message}"""
+                    }
                 }
                 
                 response = requests.post(url, headers=headers, json=data)
