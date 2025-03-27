@@ -106,8 +106,8 @@ def login():
 
 @app.route('/manage_users', methods=['GET', 'POST'])
 def manage_users():
-    if 'name' not in session or session['clearance'] != 'Alpha Prime':
-        flash('Only Alpha Prime users can manage users.', 'danger')
+    if 'name' not in session or session['clearance'] not in ['Alpha Prime', 'Omega']:
+        flash('Only Alpha Prime and Omega users can manage users.', 'danger')
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':

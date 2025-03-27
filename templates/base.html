@@ -11,7 +11,7 @@
             <a class="navbar-brand" href="/">Secure Document Vault</a>
             <div>
                 {% if session.get('name') %}
-                    {% if session.get('clearance') == 'Alpha Prime' %}
+                    {% if session.get('clearance') in ['Alpha Prime', 'Omega'] %}
                         <a class="btn btn-outline-light me-2" href="{{ url_for('manage_users') }}">Manage Users</a>
                     {% endif %}
                     <a class="btn btn-outline-light" href="{{ url_for('logout') }}">Logout</a>
