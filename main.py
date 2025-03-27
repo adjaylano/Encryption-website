@@ -235,10 +235,10 @@ def assistant():
                 Available clearance levels are: {', '.join(ACCESS_LEVELS.keys())}.
                 You can help with file operations, access rights, and system information."""
 
-                # Get response using DeepAi provider
+                # Get response using DeepInfra provider
                 response = g4f.ChatCompletion.create(
                     model="gpt-3.5-turbo",
-                    provider=g4f.Provider.DeepAi,
+                    provider=g4f.Provider.DeepInfra,
                     messages=[{"role": "user", "content": user_message}]
                 )
                 
