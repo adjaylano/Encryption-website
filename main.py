@@ -227,11 +227,11 @@ def assistant():
         user_message = request.form.get('message', '').strip()
         if user_message:
             try:
-                # Use DeepSeek API for chat completion
-                url = "https://api.deepseek.com/v1/chat/completions"
+                # Use OpenAI API for chat completion
+                url = "https://api.openai.com/v1/chat/completions"
                 headers = {
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {os.environ.get('DEEPSEEK_API_KEY')}"
+                    "Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY')}"
                 }
                 
                 system_prompt = f"""You are an AI assistant helping users with a secure document vault system.
@@ -240,11 +240,12 @@ def assistant():
                 You can help with file operations, access rights, and system information."""
                 
                 data = {
-                    "model": "deepseek-chat",
+                    "model": "gpt-3.5-turbo",
                     "messages": [
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_message}
-                    ]
+                    ],
+                    "temperature": 0.7
                 }
                 
                 response = requests.post(url, headers=headers, json=data)
@@ -252,7 +253,8 @@ def assistant():
                     ai_response = response.json()['choices'][0]['message']['content']
                     return jsonify({"response": ai_response})
                 else:
-                    return jsonify({"error": "Failed to get AI response"}), 500
+                    error_message = response.json().get('error', {}).get('message', 'Failed to get AI response')
+                    return jsonify({"error": error_message}), 500
                     
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
