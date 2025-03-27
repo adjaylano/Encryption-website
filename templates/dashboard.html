@@ -21,8 +21,8 @@
                     <div class="mb-3">
                         <label class="form-label">Document Clearance Level</label>
                         <select class="form-select" name="doc_clearance" required>
-                            {% for level, value in session.get('access_levels', {}).items() %}
-                                {% if value <= ACCESS_LEVELS[session.clearance] %}
+                            {% for level in ACCESS_LEVELS %}
+                                {% if ACCESS_LEVELS[level] <= ACCESS_LEVELS[session.clearance] %}
                                     <option value="{{ level }}">{{ level }}</option>
                                 {% endif %}
                             {% endfor %}
