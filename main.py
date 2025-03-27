@@ -227,24 +227,24 @@ def assistant():
         user_message = request.form.get('message', '').strip()
         if user_message:
             try:
-                # Use Hugging Face's free API
-                url = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
-                headers = {"Content-Type": "application/json"}
+                import g4f
+
+                # Create system prompt
+                system_prompt = f"""You are an AI assistant helping users with a secure document vault system.
+                The user's clearance level is {session['clearance']}.
+                Available clearance levels are: {', '.join(ACCESS_LEVELS.keys())}.
+                You can help with file operations, access rights, and system information."""
+
+                # Get response from a free model
+                response = g4f.ChatCompletion.create(
+                    model=g4f.models.gpt_35_turbo,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message}
+                    ]
+                )
                 
-                data = {
-                    "inputs": user_message,
-                    "parameters": {
-                        "max_length": 100,
-                        "temperature": 0.7
-                    }
-                }
-                
-                response = requests.post(url, headers=headers, json=data)
-                if response.status_code == 200:
-                    ai_response = response.json()[0]['generated_text']
-                    return jsonify({"response": ai_response})
-                else:
-                    return jsonify({"error": "Failed to get AI response"}), 500
+                return jsonify({"response": response})
                     
             except Exception as e:
                 return jsonify({"error": str(e)}), 500

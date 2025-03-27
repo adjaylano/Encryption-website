@@ -11,6 +11,7 @@ gunicorn = "^21.2.0"
 cryptography = "^44.0.2"
 openai = "^1.69.0"
 requests = "^2.32.3"
+g4f = "^0.4.9.8"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
