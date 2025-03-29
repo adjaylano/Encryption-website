@@ -2,7 +2,7 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from cryptography.fernet import Fernet
-
+import os 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Change this in production
 

@@ -1,22 +1,5 @@
 
-{% extends "base.html" %}
-{% block content %}
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Add/Update User</div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="form-control" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Clearance Level</label>
+#             <label class="form-label">Clearance Level</label>
                         <select class="form-select" name="clearance" required>
                             {% for level in access_levels %}
                             <option value="{{ level }}">{{ level }}</option>
